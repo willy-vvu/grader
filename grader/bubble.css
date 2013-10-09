@@ -41,7 +41,7 @@ body{
 }
 #timer{
     position: absolute;
-	
+	overflow:hidden;
     right: 0;
     bottom: 0;
     background-color: #EEEEEE;
@@ -49,10 +49,18 @@ body{
     height: 50px;
     padding: 10px;
     text-align: center;
+    z-index: 1000;
+}
+#timer .time{
+    margin-bottom: 10px;
+	
 }
 .problemDetails{
 	font-size: 20px;
 	margin-top:30px;
+}
+#problemDescription pre{
+	font-size: 0.8em;
 }
 #problemSwitcher{
 	position: absolute;
@@ -225,4 +233,12 @@ pre{
 	position: relative;
 	height: 100%;
 	background-color: white;
+}
+.donebar{
+	position:absolute;
+	top:0;
+	right:0;
+	height:5px;
+	background-color: #FFAA00;
+	width:0%;
 }
