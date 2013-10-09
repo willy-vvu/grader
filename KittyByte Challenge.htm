@@ -1,23 +1,27 @@
 <!DOCTYPE html>
-<!--Willy Wu, 10/6/2013-->
+<!--Willy Wu , 10/6/2013-->
+<!--Kapparate, 10/6/2013-->
 <html>
 	<head>
-		<title>Autograder Example</title>
-		<link rel="stylesheet" type="text/css" href="bubble.css">
+		<title>KittyByte Challenge</title>
+		<link rel="stylesheet" type="text/css" href="grader/bubble.css">
 	</head>
 	<body>
-		<section>
-			<ol id="problemSwitcher">
-			</ol>
+		<section id="problem">
 			<section id="problemDescription">
 				<h1 class="problemName"></h1>
 				<div class="problemInput"><h2>Input</h2><pre></pre></div>
 				<div class="problemOutput"><h2>Output</h2><pre></pre></div>
 				<div class="problemDetails"></div>
 			</section>
+			<ol id="problemSwitcher">
+			</ol>
+			<h1 id="timer">
+			</h1>
 		</section>
 		<section id="submissionArea">
-			<textarea></textarea>
+			<textarea id="codebox"></textarea>
+			  <div id="codebox_ace"></div>
 		</section>
 		<section class="grader" id="grader">
 			<svg width="90" height="90">
@@ -55,8 +59,13 @@
 				</div>
 			</div>
 		</section>
-		<script src="jquery-2.0.3.min.js"></script>
-		<script src="problems.js"></script>
-		<script src="bubble.js"></script>
+		<script src="grader/jquery-2.0.3.min.js"></script>
+		<script src="grader/ace.js" type="text/javascript" charset="utf-8"></script>
+		<script src="grader/theme-eclipse.js" type="text/javascript" charset="utf-8"></script>
+		<script src="grader/mode-java.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+        </script>
+		<script src="grader/bubble.js"></script>
 	</body>
 </html>
+

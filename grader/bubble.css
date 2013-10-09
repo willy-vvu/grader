@@ -1,3 +1,13 @@
+@font-face{
+	font-family:"Roboto";
+	font-weight:300;
+	src:url("Roboto-Light.ttf");
+}
+@font-face{
+	font-family:"Roboto";
+	font-weight:100;
+	src:url("Roboto-Thin.ttf");
+}
 body{
 	font-family:"Roboto",Arial,Sans-serif;
 	font-weight:300;
@@ -8,36 +18,56 @@ body{
 	left:0;
 	right:0;
 }
+#codebox {
+	display: none;
+}
+#problem{
+    position: absolute;  
+    right: 0;  margin: 40px 40px 40px 0;  width: 400px;  top: 0;
+	
+    bottom: 0;
+}
 #problemDescription{
-	padding:10px;
-	position:fixed;
 	top:0;
 	bottom:110px;
 	right:0;
-	width:400px;
-	margin:40px;
+	width: 380px;
 	background-color: #EEEEEE;
 	overflow: auto;
 	word-wrap:break-word;
 	z-index: 1000;
+	position: absolute;
+	padding: 10px;
+}
+#timer{
+    position: absolute;
+	
+    right: 0;
+    bottom: 0;
+    background-color: #EEEEEE;
+    width: 380px;
+    height: 50px;
+    padding: 10px;
+    text-align: center;
 }
 .problemDetails{
+	font-size: 20px;
 	margin-top:30px;
 }
 #problemSwitcher{
 	position: absolute;
 	list-style: none;
-	padding: 0;
+	padding: 10px 0 10px 0;
 	top:0;
 	bottom:110px;
 	right: 5px;
 	width: 300px;
-	margin: 40px 160px 40px 0;
-	z-index: 900;
+	z-index: 899;
 	background-color: #CCCCCC;
+	overflow-y: auto;
+	margin: 0 100px 0 0;
 }
 #problemSwitcher li{
-	font-size: 1.5em;
 	padding: 5px 5px 5px 10px;
 	border-left: 5px solid;
 	cursor:pointer;
@@ -76,7 +106,7 @@ textarea{
 	position:absolute;
 	left:0;
 	bottom:0;
-	right:480px;
+	right: 440px;
 	margin: 0 40px 40px 40px;
 	z-index:10000;
 }
@@ -187,4 +217,12 @@ pre{
 	padding: 5px 10px 10px 10px;
 	word-wrap: break-word;
 	border-top: 5px solid transparent;
+}
+
+
+/*Codebox code*/
+#codebox_ace {
+	position: relative;
+	height: 100%;
+	background-color: white;
 }
