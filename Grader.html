@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+	</head>
+	<body>
+		<textarea id="theinput"></textarea>
+		<br>
+		<input type="button" value="Check" onclick="check()"/>
+		<br>
+		<textarea id="theoutput"></textarea>
+		<script type="text/javascript">
+			function check(){
+				$.ajax({
+					"url":"http://www.kapparate.com/coder/submit/13/48/-1",
+					"type":"POST",
+					"data":{
+						"code":document.getElementById("theinput").value
+					},
+					"success":function(result){
+						document.getElementById("theoutput").value=result;
+					}
+				})
+			}
+		</script>
+	</body>
+</html>

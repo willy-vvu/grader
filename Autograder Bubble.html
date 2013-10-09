@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--Willy Wu, 10/6/2013-->
+<html>
+	<head>
+		<title>Autograder Example</title>
+		<link rel="stylesheet" type="text/css" href="bubble.css">
+	</head>
+	<body>
+		<section>
+			<ol id="problemSwitcher">
+			</ol>
+			<section id="problemDescription">
+				<h1 class="problemName"></h1>
+				<div class="problemInput"><h2>Input</h2><pre></pre></div>
+				<div class="problemOutput"><h2>Output</h2><pre></pre></div>
+				<div class="problemDetails"></div>
+			</section>
+		</section>
+		<section id="submissionArea">
+			<textarea></textarea>
+		</section>
+		<section class="grader" id="grader">
+			<svg width="90" height="90">
+				<g class="icon">
+					<g class="status">
+						<circle cx="45" cy="45" r="39" fill="#CCCCCC" class="background"></circle>
+						<path d="M 70 30 l -35 35 l -15 -15" stroke-width="4" stroke="white" fill="none" class="symbol"></path>
+					</g>
+					<g class="spinner" transform="scale(0.00000001)"><!--scale(0) screws up IE-->
+						<path d="M 45 45 L 45 5      A 40 40 0 0 1 79.641 25" fill="#FF0000"></path>
+						<path d="M 45 45 L 79.641 25 A 40 40 0 0 1 79.641 65" fill="#FFAA00"></path>
+						<path d="M 45 45 L 79.641 65 A 40 40 0 0 1 45 85    " fill="#EEEE00"></path>
+						<path d="M 45 45 L 45 85     A 40 40 0 0 1 10.359 65" fill="#00CC00"></path>
+						<path d="M 45 45 L 10.359 65 A 40 40 0 0 1 10.359 25" fill="#0000FF"></path>
+						<path d="M 45 45 L 10.359 25 A 40 40 0 0 1 45 5     " fill="#AA00FF"></path>
+					</g>
+				</g>
+			</svg>
+			<div class="results">
+				<div class="leftarrow"></div>
+				<div class="leftarrow casesarrow"></div>
+				<div class="output">
+					<h1 class="previousoutput"></h1>
+					<h1 class="currentoutput">Click to check</h1>
+				</div>
+				<ol class="cases">
+					<div class="toparrow"></div>
+				</ol>
+				<div class="details">
+					<h1 class="caseName"></h1>
+					<div class="caseDetails"></div>
+					<div class="caseInput"><h2>Input</h2><pre></pre></div>
+					<div class="caseOutput"><h2>Output</h2><pre></pre></div>
+					<div class="caseExpected"><h2>Expected</h2><pre></pre></div>
+				</div>
+			</div>
+		</section>
+		<script src="jquery-2.0.3.min.js"></script>
+		<script src="problems.js"></script>
+		<script src="bubble.js"></script>
+	</body>
+</html>
