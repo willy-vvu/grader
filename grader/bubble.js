@@ -1,19 +1,61 @@
 //(function(){
 String.prototype.hashCode = function(){// From http://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
-    var hash = 0, i, char;
-    if (this.length == 0) return hash;
-    for (i = 0, l = this.length; i < l; i++) {
-        char  = this.charCodeAt(i);
-        hash  = ((hash<<5)-hash)+char;
-        hash |= 0; // Convert to 32bit integer
-    }
-    return Math.abs(hash);// Modified from original
+	var hash = 0, i, char;
+	if (this.length == 0) return hash;
+	for (i = 0, l = this.length; i < l; i++) {
+		char  = this.charCodeAt(i);
+		hash  = ((hash<<5)-hash)+char;
+		hash |= 0; // Convert to 32bit integer
+	}
+	return Math.abs(hash);// Modified from original
 };
 var newHash =function(){
 	return (new Date()).valueOf().toString()+(Math.random()).toString().hashCode();
 }
 var userID= newHash();
-
+//Given returns a if r=0 and b if r=1 and intermediate values for non-integer r.
+var lerp=function(a,b,r){
+	return a*(1-r)+b*r;
+}
+//Returns a value of n such that min<n<max
+var clamp=function(n,min,max){
+	return Math.min(Math.max(n,min),max);
+}
+var colorDef={
+	"green":"#00CC00",
+	"yellow":"#EEEE00",
+	"orange":"#FFAA00",
+	"red":"#FF0000",
+	"purple":"#AA00FF",
+	"blue":"#0000FF",
+	"gray":"#CCCCCC",
+	"cyan":"#00CCCC"
+}
+var symbolDef={
+	"check":"M 70 30 l -35 35 l -15 -15",//Check
+	"unequal":"M 25 35 l 40 0 M 25 55 l 40 0 M 35 65 l 20 -40",//Unequal
+	"diamond":"M 45 20 L 70 45 L 45 70 L 20 45 Z",//Diamond
+	"cross":"M 25 25 l 40 40 M 25 65 l 40 -40",//Cross
+	"triangle":"M 45 20 L 20 60 L 70 60 Z",//Triangle
+	"offline":"M 45 20 L 30 45 L 60 45 L 45 70"//Offline
+}
+var renderTime = function(time){
+	var minutes=Math.floor(time/1000)%60;
+	return (Math.floor(time/60000)+":"+(minutes<10?"0":"")+minutes+"."+Math.floor(time%1000/100));
+}
+var median = function(array){
+	if(array.length>0) {
+		array.sort(function(a,b){return a-b});
+		var half = Math.floor(array.length/2);
+		if(array.length % 2){
+			return array[half];
+		}
+		else{
+			return (array[half-1] + array[half]) / 2.0;
+		}
+	}
+	return 0;
+}
 var Grader=function(inputFunction,submitURL){
 	//Has this been touched?
 	this.activated=false;
@@ -36,7 +78,7 @@ var Grader=function(inputFunction,submitURL){
 	this.cases=[];
 	this.currentCase=0;
 	this.icon="check";
-	this.background="gray";
+	this.background="cyan";
 	//Variables for text
 	this.textSwap=0;
 	this.casesVisible=0;
@@ -53,23 +95,35 @@ var Grader=function(inputFunction,submitURL){
 	this.savedTime=null;
 	this.startTime=null;
 	this.eventHash=null;
+	this.pastTimes=[];
+	this.medianTime=0;
 }
+var updateTextPromptTimer=0;
 Grader.prototype={
 	//Updates the output text of the bubble. If text==true, set text from object field and do not animate.
-	updateText:function(text){
-		if(text!=true&&text.length){
-			this.currentOutput=text;
-		}
+	updateText:function(flag,customText){
+		clearTimeout(updateTextPromptTimer);
 		// Added line
 		if(this!=graders[currentProblem]){return}
-		if(text==true){
+		if(flag=="noanimate"){
 			this.element.find(".previousoutput").text("");
 			this.element.find(".currentoutput").text(this.currentOutput);
 		}
 		else{
 			this.element.find(".previousoutput").text(this.element.find(".currentoutput").text());
-			this.element.find(".currentoutput").text(text);
+			this.element.find(".currentoutput").text(customText||this.currentOutput);
 			this.textSwap=1;
+		}
+		if(flag=="prompt"){
+			updateTextPromptTimer=setTimeout(function(grader){
+				clearTimeout(updateTextPromptTimer);
+				grader.updateText(false,"Mouse over for details");
+				requestGraderUpdate(grader);
+				updateTextPromptTimer = setTimeout(function(grader){
+					grader.updateText();
+					requestGraderUpdate(grader);
+				},3000, grader)
+			}, 3000, this)
 		}
 	},
 	//Updates the icon, with background and symbol.
@@ -148,6 +202,14 @@ Grader.prototype={
 			$details.find(".caseExpected>pre").text("");
 		}
 	},
+	updateMedianTime:function(){
+		if(currentProblem==0||graders[currentProblem].medianTime<=0){
+			timerElement.find(".medianTime").text("No previous data");
+		}
+		else{
+			timerElement.find(".medianTime").text("Median "+renderTime(graders[currentProblem].medianTime));
+		}
+	},
 	//Simulates bouncy motion by updating scale and velocity
 	simulate:function(){
 		this.scale+=this.velocity;
@@ -193,31 +255,7 @@ Grader.prototype={
 	casesPeek:0.05,//The amount the test case bar will "peek" out when inactive
 	duplicateDelay:500//How many milliseconds between button pushes to disregard
 }
-//Given returns a if r=0 and b if r=1 and intermediate values for non-integer r.
-var lerp=function(a,b,r){
-	return a*(1-r)+b*r;
-}
-//Returns a value of n such that min<n<max
-var clamp=function(n,min,max){
-	return Math.min(Math.max(n,min),max);
-}
-var colorDef={
-	"green":"#00CC00",
-	"yellow":"#EEEE00",
-	"orange":"#FFAA00",
-	"red":"#FF0000",
-	"purple":"#AA00FF",
-	"blue":"#0000FF",
-	"gray":"#CCCCCC"
-}
-var symbolDef={
-	"check":"M 70 30 l -35 35 l -15 -15",//Check
-	"unequal":"M 25 35 l 40 0 M 25 55 l 40 0 M 35 65 l 20 -40",//Unequal
-	"diamond":"M 45 20 L 70 45 L 45 70 L 20 45 Z",//Diamond
-	"cross":"M 25 25 l 40 40 M 25 65 l 40 -40",//Cross
-	"triangle":"M 45 20 L 20 60 L 70 60 Z",//Triangle
-	"offline":"M 45 20 L 30 45 L 60 45 L 45 70"//Offline
-}
+
 var mouseUp=function(){
 	for(var grader=0;grader<graders.length;grader++){
 		var currentGrader=graders[grader];
@@ -282,7 +320,8 @@ var checkProblem=function(grader){
 	if(grader.lastCheck==false||((new Date()).valueOf()-grader.lastCheck)>grader.duplicateDelay){
 		grader.lastCheck=(new Date()).valueOf();
 		if(grader.loading==0){
-			grader.updateText("Checking...");
+			grader.currentOutput="Checking...";
+			grader.updateText();
 			grader.loading=1;
 			grader.casesVisible=0;
 			grader.clicked=0;
@@ -359,7 +398,8 @@ var serverData=function(grader,serverData){
 				switch(serverData.status){
 					case "correct":
 						grader.updateIcon("green","check")
-						grader.updateText("All test cases pass. Good job!");
+						grader.currentOutput="All test cases pass. Good job!";
+						grader.updateText("prompt");
 						//Added
 						if(grader.savedTime==null){
 							clearTimeout(switchToNextProblemTimer);
@@ -370,7 +410,8 @@ var serverData=function(grader,serverData){
 						break;
 					case "mismatch":
 						grader.updateIcon("yellow","unequal")
-						grader.updateText("Returned the wrong result");
+						grader.currentOutput="Returned the wrong result";
+						grader.updateText("prompt");
 						break;
 				}
 				for(var c=0;c<serverData.cases.length;c++){
@@ -401,7 +442,8 @@ var serverData=function(grader,serverData){
 				break;
 			case "runtime":
 				grader.updateIcon("orange","diamond")
-				grader.updateText("Submission cannot run");
+				grader.currentOutput="Submission cannot run";
+				grader.updateText("prompt");
 				grader.cases=[{
 					"color":"orange",
 					"name":"Runtime error",
@@ -410,7 +452,8 @@ var serverData=function(grader,serverData){
 				break;
 			case "compile":
 				grader.updateIcon("red","cross")
-				grader.updateText("Submission cannot compile");
+				grader.currentOutput="Submission cannot compile";
+				grader.updateText("prompt");
 				grader.cases=[{
 					"color":"red",
 					"name":"Compilation error",
@@ -419,7 +462,8 @@ var serverData=function(grader,serverData){
 				break;
 			case "server":
 				grader.updateIcon("purple","triangle")
-				grader.updateText(serverData.text||"Server error");
+				grader.currentOutput=serverData.text||"Server error";
+				grader.updateText("prompt");
 				grader.cases=[{
 					"color":"purple",
 					"name":"Server error",
@@ -428,7 +472,8 @@ var serverData=function(grader,serverData){
 				break;
 			case "offline":
 				grader.updateIcon("blue","offline")
-				grader.updateText(serverData.text||"You are offline");
+				grader.currentOutput=serverData.text||"You are offline";
+				grader.updateText("prompt");
 				grader.cases=[{
 					"color":"blue",
 					"name":"Internet disconnected",
@@ -437,7 +482,8 @@ var serverData=function(grader,serverData){
 				break;
 			default:
 				grader.updateIcon("purple","triangle")
-				grader.updateText(serverData.text||"Unknown error");
+				grader.currentOutput=serverData.text||"Unknown error";
+				grader.updateText("prompt");
 				grader.cases=[{
 					"color":"purple",
 					"name":"Unknown error",
@@ -447,7 +493,8 @@ var serverData=function(grader,serverData){
 	}
 	catch(error){
 		grader.updateIcon("purple","triangle")
-		grader.updateText("Grader error");
+		grader.currentOutput="Grader error";
+		grader.updateText("prompt");
 		grader.cases=[{
 			"color":"purple",
 			"name":"Grader error",
@@ -492,7 +539,7 @@ var lerpUpdate=function(grader,variable,target,rate){
 //Fully updates a grader.
 var fullUpdate=function(grader){
 	grader.fullUpdate=true;
-	grader.updateText(true);
+	grader.updateText("noanimate");
 	grader.updateIcon();
 	grader.updateCaseBar();
 	grader.updateCaseDetails();
@@ -603,10 +650,19 @@ var switchToProblem=function(problemNumber){
 						"problemID":graders[currentProblem].submitURL.split("/").slice(-2,-1)[0],
 						"userID":userID,
 						"eventHash":graders[currentProblem].eventHash
+					},
+					"dataType":"JSON",
+					"success":function(response){
+						if(response&&currentProblem>0){
+							graders[currentProblem].pastTimes = response;
+							graders[currentProblem].medianTime = median(graders[currentProblem].pastTimes);
+							graders[currentProblem].updateMedianTime();
+						}
 					}
 				})
 			}
 		}
+		graders[currentProblem].updateMedianTime();
 		//Load the code
 		setValueToSubmissionArea(graders[currentProblem].savedCode);
 		//Mark current as viewed
@@ -631,16 +687,21 @@ var switchToProblem=function(problemNumber){
 			$problem.find(".problemOutput>pre").text("");
 		}
 		$problem.find(".problemDetails").html(problems[currentProblem].statement);
-		updateProblemSwitcher();
-		if(window.demo){
-			avgTime=currentProblem==0?0:Math.random()*Math.random()*120000+30000;
-			var minutes=Math.floor(avgTime/1000)%60;
-			timerElement.find(".avgTime").text(Math.floor(avgTime/60000)+":"+(minutes<10?"0":"")+minutes+"."+Math.floor(avgTime%1000/100)+" Average");
-			done=0;
+		//Update email text
+		if(graders[currentProblem].successful && currentProblem > 0) {
+					var problemid = problems[currentProblem].submitURL.split("/").slice(-2,-1)[0];
+			$(".answerlink").show();
+			$(".answerlink").html($("<a>Top Answers</a>").attr("href","http://www.kittybyte.com/coder/kittyanswers/"+problemid));
 		}
+		else if(currentProblem>0) {
+			$(".answerlink").show();
+			$(".answerlink").html("<a href=\"https://www.kittybyte.com/register/\">Register for an account</a> to receive email updates.");
+		}else {
+			$(".answerlink").hide();
+		}
+		updateProblemSwitcher();
 	}
 }
-var avgTime=null;
 var updateProblemSwitcher=function(){
 	problemSwitcher.find("li").each(function(index){
 		var borderColor="transparent";
@@ -675,7 +736,7 @@ var switchToNextProblem=function(current){
 				switchToProblem(tryProblem);
 				return;
 			}
-		};
+		}
 	}
 }
 
@@ -684,10 +745,10 @@ var done=0;
 var timerElement = $("#timer");
 var updateTimer = function(){
 	if(currentProblem!=null&&graders[currentProblem].startTime!=null){
-		var currentTime;
+		var currentTime, fromStart = (new Date()).valueOf()-graders[currentProblem].startTime;
 		if(currentProblem>0){
 			if(graders[currentProblem].savedTime==null){
-				currentTime =(new Date()).valueOf()-graders[currentProblem].startTime;
+				currentTime = fromStart;
 			}
 			else{
 				currentTime = graders[currentProblem].savedTime;
@@ -696,20 +757,31 @@ var updateTimer = function(){
 		else{
 			currentTime=0;
 		}
-		var minutes=Math.floor(currentTime/1000)%60;
-		timerElement.find(".time").text(Math.floor(currentTime/60000)+":"+(minutes<10?"0":"")+minutes+"."+Math.floor(currentTime%1000/100));
-		if(window.demo){
-			if(currentProblem>0){
-				done=clamp(currentTime/(avgTime*2),0,1);
-				timerElement.find(".donebar").css("width",100*done+"%");
-				timerElement.find(".percent").text(Math.round(100*done)+"% are done");
+		timerElement.find(".time").text(renderTime(currentTime));
+		var pastTimes=graders[currentProblem].pastTimes;
+		var p=pastTimes.length;
+		while(p>0){
+			if(pastTimes[p-1]<=fromStart){
+				break;
+			}
+			p--;
+		}
+		var done=pastTimes.length==0?0:p/(pastTimes.length)
+		if(currentProblem<=0||graders[currentProblem].medianTime<=0){
+			timerElement.find(".donebar").css("width","0%");
+			timerElement.find(".percent").text("No previous data");
+		}
+		else{
+			timerElement.find(".donebar").css("width",100*done+"%");
+			var displayNum=Math.round(100*done);
+			if(displayNum==0){
+				timerElement.find(".percent").text("<1% are done");
+			}
+			else if(displayNum==100){
+				timerElement.find(".percent").text(">99% are done");
 			}
 			else{
-				timerElement.find(".donebar").css("width","0%");
-				timerElement.find(".percent").text("0% is done");
-				if(avgTime==null){
-					timerElement.find(".avgTime").text("0:00.0 Average")
-				}
+				timerElement.find(".percent").text(displayNum+"% are done");
 			}
 		}
 	}
@@ -742,53 +814,49 @@ var unescapeObject = function(object){
 }
 var problems=[];
 var init=function(data){
-problems=unescapeObject(data);
-for(var p=0;p<problems.length;p++){
-	var newGrader=new Grader(valueFromSubmissionArea,problems[p].submitURL);
-	newGrader.savedCode=(problems[p].defaultCode);
-	newGrader.element=graderElement;
-	graders.push(newGrader);
-	problemSwitcher.append(
-		$("<li class=\"problem\"></li>")
-		.text(p+1+". "+problems[p].title)
-		.attr("data-problem",p)
-		.click(problemClick));
-}
-//Bind events
-codebox.commands.addCommand({
-  name: 'myCommand',
-  bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
-  exec: function(editor) {
-        checkProblem(graders[currentProblem]);
-    },
+	problems=unescapeObject(data);
+	for(var p=0;p<problems.length;p++){
+		var newGrader=new Grader(valueFromSubmissionArea,problems[p].submitURL);
+		newGrader.savedCode=(problems[p].defaultCode);
+		newGrader.element=graderElement;
+		graders.push(newGrader);
+		problemSwitcher.append(
+			$("<li class=\"problem\"></li>")
+			.text(p+1+". "+problems[p].title)
+			.attr("data-problem",p)
+			.click(problemClick));
+	}
+	//Bind events
+	codebox.commands.addCommand({
+	  name: 'myCommand',
+	  bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
+	  exec: function(editor) {
+			checkProblem(graders[currentProblem]);
+		},
 
-});
-graderElement.find("svg").on({
-	"mousedown":iconMouseDown,
-	"mouseup":iconMouseUp,
-	"mouseenter":iconMouseEnter,
-	"mouseleave":iconMouseLeave
-})
-graderElement.find(".results").on({
-	"mouseenter":resultsMouseEnter,
-	"mouseleave":resultsMouseLeave,
-})
-graderElement.find(".cases").on({
-	"mousemove":casesMouseMove
-})
-timerElement.mouseenter(function(){
-	if(window.demo){
+	});
+	graderElement.find("svg").on({
+		"mousedown":iconMouseDown,
+		"mouseup":iconMouseUp,
+		"mouseenter":iconMouseEnter,
+		"mouseleave":iconMouseLeave
+	})
+	graderElement.find(".results").on({
+		"mouseenter":resultsMouseEnter,
+		"mouseleave":resultsMouseLeave,
+	})
+	graderElement.find(".cases").on({
+		"mousemove":casesMouseMove
+	})
+	timerElement.mouseenter(function(){
 		timerElement.stop().animate({"height":"150px"},300,expoEaseOut)
-	}
-})
-.mouseleave(function(){
-	if(window.demo){
+	})
+	.mouseleave(function(){
 		timerElement.stop().animate({"height":"50px"},300,expoEaseOut);
-	}
-})
+	})
 
-switchToProblem(0);
-updateTimer();
+	switchToProblem(0);
+	updateTimer();
 }
 $.ajax({
 	"url":"http://www.kittybyte.com/coder/kittyproblems",
