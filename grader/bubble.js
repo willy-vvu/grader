@@ -718,16 +718,18 @@ var updateProblemSwitcher=function(){
 		}
 	})
 }
-problemSwitcher.parent().mouseenter(function(){
-	problemSwitcher.stop().animate({"right":"300px"},400,expoEaseOut)
+var problemDescription=$("#problemDescription");
+$(".problemSwitcherTitle").mouseenter(function(){
+	problemDescription.stop().animate({"margin-left":"400px"},400,expoEaseOut)
 })
-.mouseleave(function(){hideProblemSwitcher()});
+$("#problemHolder").mouseleave(function(){hideProblemSwitcher()});
 var hideProblemSwitcher=function(){
-	problemSwitcher.stop().animate({"right":"5px"},400,expoEaseOut);
+	problemDescription.stop().animate({"margin-left":"5px"},400,expoEaseOut);
 }
 var expoEaseOut=function (x, t, b, c, d) { //http://gsgd.co.uk/sandbox/jquery/easing/
 	return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
 }
+$.easing.expoEaseOut=expoEaseOut
 var switchToNextProblem=function(current){
 	if(currentProblem==current){
 		for (var p = 1; p < problems.length; p++) {
@@ -743,6 +745,8 @@ var switchToNextProblem=function(current){
 var done=0;
 //Timer
 var timerElement = $("#timer");
+var timerDropUp = $("#timer .dropup");
+var timerDoneBar = $("#timer .donebar");
 var updateTimer = function(){
 	if(currentProblem!=null&&graders[currentProblem].startTime!=null){
 		var currentTime, fromStart = (new Date()).valueOf()-graders[currentProblem].startTime;
@@ -761,7 +765,7 @@ var updateTimer = function(){
 		var pastTimes=graders[currentProblem].pastTimes;
 		var p=pastTimes.length;
 		while(p>0){
-			if(pastTimes[p-1]<=fromStart){
+			if(pastTimes[p-1]<=currentTime){
 				break;
 			}
 			p--;
@@ -849,10 +853,12 @@ var init=function(data){
 		"mousemove":casesMouseMove
 	})
 	timerElement.mouseenter(function(){
-		timerElement.stop().animate({"height":"150px"},300,expoEaseOut)
+		timerDropUp.stop().fadeIn({"easing":"expoEaseOut","duration":800})
+		timerDoneBar.stop().animate({"height":"70px"},800,"expoEaseOut")
 	})
 	.mouseleave(function(){
-		timerElement.stop().animate({"height":"50px"},300,expoEaseOut);
+		timerDropUp.stop().fadeOut({"easing":"expoEaseOut","duration":800})
+		timerDoneBar.stop().animate({"height":"5px"},800,"expoEaseOut")
 	})
 
 	switchToProblem(0);

@@ -31,7 +31,10 @@ var s = document.getElementsByTagName('script')[0];
 	</head>
 	<body>
 		<section id="problem">
-			<div id="problemMouseCapture">
+			<div id="problemHolder">
+				<h1 class="problemSwitcherTitle">All problems</h1>
+				<ol id="problemSwitcher">
+				</ol>
 				<section id="problemDescription">
 					<h1 class="problemName"></h1>
 					<div class="problemInput"><h2>Input</h2><pre></pre></div>
@@ -39,14 +42,15 @@ var s = document.getElementsByTagName('script')[0];
 					<div class="problemDetails"></div>
 					<div class="answerlink"></div>
 				</section>
-				<ol id="problemSwitcher">
-				</ol>
 			</div>
 			<div id="timer">
 				<h1 class="time"></h1>
-				<h1 class="medianTime"></h1>
-				<h1 class="percent"></h1>
 				<div class="donebar"></div>
+				<div class="dropup">
+					<div class="downarrow"></div>
+					<h1 class="medianTime"></h1>
+					<h1 class="percent"></h1>
+				</div>
 			</div>
 		</section>
 		<section id="submissionArea">

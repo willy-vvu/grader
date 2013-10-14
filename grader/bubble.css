@@ -28,23 +28,26 @@ body{
     bottom: 0;
 }
 #problemDescription{
-	top:0;
-	bottom:110px;
+	margin: 0 0 70px 5px;
+	bottom: 0;
 	right:0;
-	width: 375px;
+	left: 0;
 	background-color: #EEEEEE;
 	overflow: auto;
 	word-wrap:break-word;
 	z-index: 1000;
 	position: absolute;
 	padding: 10px;
+	z-index: 10000;
+	top: 0%;
+	width: 380px;
 }
 .problemDetails pre {
 	font-size: 14px;
 }
 #timer{
     position: absolute;
-	overflow:hidden;
+	
     right: 0;
     bottom: 0;
     background-color: #EEEEEE;
@@ -52,12 +55,8 @@ body{
     height: 50px;
     padding: 10px;
     text-align: center;
-    z-index: 1000;
+    z-index: 100000;
     /* border-top: 40px solid white; */
-}
-#timer .time{
-    margin-bottom: 10px;
-	
 }
 .problemDetails{
 	font-size: 20px;
@@ -72,14 +71,16 @@ body{
 	position: absolute;
 	list-style: none;
 	padding: 10px 0 10px 0;
-	top:0;
 	bottom:110px;
-	right: 5px;
-	width: 295px;
+	right: 0px;
 	z-index: 899;
-	background-color: #CCCCCC;
+	background-color: #DDDDDD;
 	overflow-y: auto;
-	margin: 0 100px 0 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	margin: 0 0 70px 0;
+	z-index: 10;
 }
 #problemSwitcher li{
 	padding: 5px 5px 5px 10px;
@@ -89,9 +90,10 @@ body{
 	-ms-user-select:none;
 	-moz-user-select:none;
 	-webkit-user-select:none;
+	font-size: 1.5em;
 }
 #problemSwitcher li:hover{
-	background-color: #DDDDDD;
+	background-color: #E5E5E5;
 }
 #problemSwitcher li:active{
 	background-color: #BBBBBB;
@@ -247,4 +249,55 @@ pre{
 	height:5px;
 	background-color: #FFAA00;
 	width:0%;
+	z-index: 100;
+}
+.problemInput,.problemOutput{
+	display: none;
+}
+.problemSwitcherTitle{
+    position: absolute;
+	
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    right: 0;
+    height: 50px;
+    padding: 10px;
+    background-color: #DDDDDD;
+    cursor: pointer;
+	user-select:none;
+	-ms-user-select:none;
+	-moz-user-select:none;
+	-webkit-user-select:none;
+}
+#problemHolder{
+    left: 0;
+
+    right: 0;
+    position: absolute;
+    bottom: 110px;
+    top: 0;
+    overflow: hidden;
+}
+.answerlink{
+	margin-top:20px;
+}
+.dropup{
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    background-color: #EEEEEE;
+    border-top: 5px solid #FFAA00;
+    z-index: 100000;
+    padding: 10px;
+    display:none;
+}
+.downarrow{
+    position: absolute;
+	
+    left: 180px;
+    bottom: -40px;
+    border: 20px solid transparent;
+    border-top: 20px solid #EEEEEE;
 }
